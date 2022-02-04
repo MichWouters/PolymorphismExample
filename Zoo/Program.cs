@@ -1,9 +1,8 @@
 ﻿using Zoo;
 
-Console.WriteLine("Hello, World!");
-
-IList<Animal> animals = GenerateAnimals();
-PrintAnimals(animals);
+// Keep Controller code as simple as possible. Use methods as much as possible.
+IList<Animal> animalsOnFarm = GenerateAnimals();
+PrintAnimals(animalsOnFarm);
 
 IList<Animal> GenerateAnimals()
 {
@@ -16,10 +15,9 @@ IList<Animal> GenerateAnimals()
     Animal cow = new Cow("Bella", new[] { "Grass" });
 
     /* Polymorphism and generics: A generic<T> list can store a list of any data type.
-        * But, once the data type is set, that list can only store objects of that type. E.g. A list of int cannot contain a string.
-        * Inheritance is a 'is - a ' relationship -> Cat is an animal, dog is an animal.
-        * Ergo -> These can be stored in a list of animals.
-     */
+     * But, once the data type is set, that list can only store objects of that type. E.g. A list of int cannot contain a string.
+     * Inheritance is a 'is - a ' relationship -> Cat is an animal, dog is an animal.
+     * Ergo -> These can be stored in a list of animals.*/
     IList<Animal> animals = new List<Animal>();
     animals.Add(cat);
     animals.Add(dog);
@@ -38,6 +36,7 @@ void PrintAnimals(IList<Animal> animals)
 
         // Polymorphism and overriding
         // Thanks to overriding, we can call the same method X amount of times and get a different result, based on the type of class being handled.
+        // This is also part of the Open/Closed principle -> See SOLID.
         Console.WriteLine(animal.GetAnimalCall());
 
         // BUT, we cannot access the extra Properties and Methods in the derived classes.
@@ -46,7 +45,7 @@ void PrintAnimals(IList<Animal> animals)
         Carnivore carnivore = animal as Carnivore;
         if (carnivore is not null)
         {
-            // Single Responsability -> One methodod = One responsability
+            // Single Responsability -> One method = One responsability
             PrintCarnivoreInfo(carnivore);
         }
 
@@ -68,14 +67,14 @@ void PrintCarnivoreInfo(Carnivore carnivore)
     Console.WriteLine($"This predator enjoys hunting: {string.Join(" and ", carnivore.FavouritePrey)}");
     Console.WriteLine($"Is this predator lethal to humans?: {(carnivore.IsDangerousToHumans ? "Yes" : "No")}");
 
-    Cat cat = carnivore as Cat;
-    if (cat != null)
+    // Is returns a bool -> If true, this class can be derived into a deriving class
+    // Type check and conversion can be combined.
+    if (carnivore is Cat cat)
     {
         Console.WriteLine($"Is this kitty a house cat?: {(cat.IsHouseCat ? "Yes" : "No")}");
     }
 
-    Dog dog = carnivore as Dog;
-    if (dog != null)
+    if (carnivore is Dog dog)
     {
         Console.WriteLine($"Is this dog a good boy?: {(dog.IsGoodBoy ? "Ofcourse" : "No, but actually yes")}");
         dog.FetchStick();
@@ -86,13 +85,9 @@ void PrintHerbivoreInfo(Herbivore herbivore)
 {
     Console.WriteLine($"This herbivore enjoys: {string.Join("and", herbivore.FavouriteFoods)}");
 
-    // Is returns a bool -> If true, this class can be derived into a deriving class
-    // As is usually more performant.
-    if (herbivore is Cow)
+    if (herbivore is Cow cow)
     {
-        Cow cow = (Cow)herbivore;
         Console.WriteLine($"This cow has {cow.AmountOfStomachs} stomachs");
-
         cow.ProduceMilk();
     }
 }
